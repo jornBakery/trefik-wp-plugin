@@ -1,7 +1,7 @@
 <?php
 namespace Trefik\Integrations\Wixmo\Api;
 
-use Trefik\Core\Helper;
+use Trefik\Core\Config;
 use \WP_ERROR;
 
 defined('ABSPATH') || exit;
@@ -14,16 +14,15 @@ defined('ABSPATH') || exit;
 abstract class ApiBase {
 
     /** @var string Token endpoint (Keycloak / OIDC) */
-    protected string $token_url = TREFIK_WIXMO_API_TOKEN_URL;
+    protected string $token_url = '';
 
     /** @var string API base URL (child can override) */
-    protected string $api_base_url = ''; // e.g. https://tref-ik.mijntheorieonline.nl
+    protected string $api_base_url = '';
 
     /** @var string Client credentials */
     protected string $client_id;
     protected string $client_secret;
     protected string $grant_type;
-
 
     /** @var string transient key (can be unique per env/site) */
     protected string $token_transient_key = 'trefik_wixmo_api_access_token';
@@ -31,17 +30,23 @@ abstract class ApiBase {
     /** @var int seconds to subtract from expires_in to avoid edge expiry */
     protected int $expiry_skew_seconds = 30;
 
-    public function __construct(?string $client_id = null, ?string $client_secret = null, ?string $api_base_url = null) {
-        $this->client_id     = $client_id     ?? (defined('TREFIK_WIXMO_API_CLIENT_ID') ? (string) TREFIK_WIXMO_API_CLIENT_ID : '');
-        $this->client_secret = $client_secret ?? (defined('TREFIK_WIXMO_API_CLIENT_SECRET') ? (string) TREFIK_WIXMO_API_CLIENT_SECRET : '');
-        $this->grant_type = $grant_type ?? (defined('TREFIK_WIXMO_API_GRANT_TYPE') ? (string) TREFIK_WIXMO_API_GRANT_TYPE : '');
+    public function __construct(
+        ?string $client_id = null,
+        ?string $client_secret = null,
+        ?string $api_base_url = null,
+        ?string $token_url = null,
+        ?string $grant_type = null
+    ) {
+        $cid = Config::get('wixmo.client_id');
+        $csec = Config::get('wixmo.client_secret');
 
+        $this->client_id = $client_id ?? ( $cid !== null ? (string) $cid : '' );
+        $this->client_secret = $client_secret ?? ( $csec !== null ? (string) $csec : '' );
+        $this->grant_type = $grant_type ?? (string) Config::get('wixmo.grant_type');
+        $this->token_url = $token_url ?? (string) Config::get('wixmo.token_url');
 
-        if (!empty($api_base_url)) {
-            $this->api_base_url = rtrim($api_base_url, '/');
-        } else {
-            $this->api_base_url = rtrim($this->api_base_url, '/');
-        }
+        $base = $api_base_url ?? (string) Config::get('wixmo.api_base_url');
+        $this->api_base_url = rtrim($base, '/');
     }
 
     /**
@@ -204,7 +209,10 @@ abstract class ApiBase {
      */
     protected function fetch_access_token(): string|WP_Error {
         if ($this->client_id === '' || $this->client_secret === '') {
-            return new WP_Error('trefik_wixmo_api_missing_credentials', 'Client credentials are missing (client_id/client_secret).');
+            return new WP_Error(
+                'trefik_wixmo_api_missing_credentials',
+                'Wixmo API client credentials are not configured. Set TREFIK_WIXMO_API_CLIENT_ID and TREFIK_WIXMO_API_CLIENT_SECRET in wp-config.php or the environment.'
+            );
         }
 
         $response = wp_remote_post($this->token_url, [

@@ -2,8 +2,8 @@
 namespace Trefik\Integrations\WooCommerce;
 
 use Trefik\Core\Helper;
-use Trefik\Integrations\Wixmo\Api\StudentApi;
 use Trefik\Integrations\Wixmo\Api\LicenseApi;
+use Trefik\Integrations\Wixmo\Api\StudentApi;
 
 
 class WooOrderHooks {
@@ -48,15 +48,12 @@ class WooOrderHooks {
             //     continue;
             // }
             $strTime = $item->get_meta('tijd');
-            $licenseId = get_field( 'license_id', $item->get_product_id());
-            $studyGroupId = get_field( 'study_group_id', $item->get_product_id());
-            Helper::write_log([$item->get_product_id(), $licenseId, $studyGroupId]);
-            Helper::write_log(["strTime", $strTime]);
-
-            // Helper::dumpd($item->get_formatted_meta_data(), false);
-                        // $strTime = $item->get_meta('tijd');
-            $extended_days = $this->get_extended_days($item->get_variation_id());
-            Helper::write_log(["Extended Days", $extended_days]);
+            $licenseId = get_field( 'license_id', $item->get_product_id() );
+            $studyGroupId = get_field( 'study_group_id', $item->get_product_id() );
+            $extended_days = $this->get_extended_days( $item->get_variation_id() );
+            Helper::write_log( [ $item->get_product_id(), $licenseId, $studyGroupId ] );
+            Helper::write_log( [ 'strTime', $strTime ] );
+            Helper::write_log( [ 'Extended Days', $extended_days ] );
 
             $userId = $studentApi->create([
                 'userName'  => $order->get_billing_email(),
@@ -71,58 +68,41 @@ class WooOrderHooks {
                 "type" => "STUDENT",
             ]);
             
-            if(!$userId) {
-                Helper::write_log(["userId niet gevonden vanuit wixmo"]);
+            if ( ! $userId ) {
+                Helper::write_log( [ 'userId niet gevonden vanuit wixmo' ] );
                 $order->add_order_note( 'userId niet gevonden vanuit wixmo' );
-
-            } elseif( $extended_days ) {
-                Helper::write_log(["CALL API Extend Days", $extended_days]);
-                $licenseApi = new LicenseApi();
-
+            } else {
                 $order->add_meta_data( '_wixmo_user_id', $userId );
-                $licenseCall = $licenseApi->extend_validity_days([
-                    'firstName' => $order->get_billing_first_name(),
-                    'lastName'  => $order->get_billing_last_name(),
-                    'email'     => $order->get_billing_email(),
-                    'licenseId' => $licenseId,
+            }
+
+            // Wixmo: verlengen via license-endpoint. Response wordt niet in WooCommerce als "licentie" verwerkt.
+            if ( $userId && $extended_days > 0 && $licenseId ) {
+                $licenseApi  = new LicenseApi();
+                $licenseCall = $licenseApi->extend_validity_days( [
+                    'firstName'     => $order->get_billing_first_name(),
+                    'lastName'      => $order->get_billing_last_name(),
+                    'email'         => $order->get_billing_email(),
+                    'licenseId'     => $licenseId,
                     'validityDays'  => $extended_days,
-                ]);
-
-                Helper::write_log(["licenseCall", $licenseCall]);
-
+                ] );
+                Helper::write_log( [ 'wixmo_extend_validity', $licenseCall ] );
             }
         }
 
-        // '/api/licenses/{licenseId}/_extend-validity-days'
-
-
-        // Genereer een dummy licentiecode (vervang dit met je eigen logica)
-        $license_key = 'DUMMY-LICENSE-KEY-' . uniqid();
-
-        // Voeg de licentiecode toe als order meta data
-        $order->add_meta_data( '_license_key', $license_key );
-
-        // Zet de order status op 'completed'
         $order->update_status( 'completed' );
-
-        // Optioneel: Voeg een notitie toe aan de order
-        $order->add_order_note( 'Licentiecode gegenereerd en toegewezen: ' . $license_key );
 
     }
 
     private function get_extended_days( $variation_id ) {
-
-        if ( $variation_id ) {
-            /** @var \WC_Product_Variation $variation */
-            $variation = wc_get_product( $variation_id );
-
-                // 2) Get Extended Days from meta_data
-                $extended_days = $variation->get_meta( '_extended_days', true ); // true = single value
-
-                return is_numeric( $extended_days ) ? (int)$extended_days : 0;
+        if ( ! $variation_id ) {
+            return 0;
         }
-
-        return 0;
+        $variation = wc_get_product( $variation_id );
+        if ( ! $variation || ! is_a( $variation, 'WC_Product_Variation' ) ) {
+            return 0;
+        }
+        $extended_days = $variation->get_meta( '_extended_days', true );
+        return is_numeric( $extended_days ) ? (int) $extended_days : 0;
     }
 
     // Allow payment for failed, pending, and cancelled orders

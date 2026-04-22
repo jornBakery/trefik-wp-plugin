@@ -142,44 +142,6 @@ foreach ( $items as $item_id => $item ) :
                                                                                     </th>
                                                                                 </tr>
                                                                                 <tr>
-                                                                                    <th class="pc-w620-textAlign-left"
-                                                                                        align="left" valign="top"
-                                                                                        style="">
-                                                                                        <table border="0"
-                                                                                            cellpadding="0"
-                                                                                            cellspacing="0"
-                                                                                            role="presentation"
-                                                                                            class="pc-w620-textAlign-left"
-                                                                                            width="100%">
-                                                                                            <tr>
-                                                                                                <td valign="top"
-                                                                                                    class="pc-w620-textAlign-left"
-                                                                                                    align="left">
-                                                                                                    <div class="pc-font-alt pc-w620-textAlign-left"
-                                                                                                        style="text-decoration: none;">
-                                                                                                        <div style="font-size:16px;mso-line-height-alt:20px;line-height:20px;text-align:left;text-align-last:left;color:#001942;font-weight:700;font-style:normal;">
-                                                                                                            <div>
-                                                                                                                <span style="font-family: 'DM Sans', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 140%; letter-spacing: -0.03em;" class="pc-w620-font-size-16px pc-w620-line-height-20px">
-                                                                                                                    Licentie Code
-                                                                                                                </span>
-                                                                                                                <span style="font-family: 'DM Sans', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 140%; letter-spacing: -0.03em; font-weight: 400;" class="pc-w620-font-size-16px pc-w620-line-height-20px">:
-                                                                                                                </span>
-                                                                                                                <span style="font-family: 'DM Sans', Arial, Helvetica, sans-serif; font-weight: 400; font-size: 16px; line-height: 140%; letter-spacing: -0.03em;">
-                                                                                                                    KEY-681b8a96a31bf
-                                                                                                                </span>
-                                                                                                                <span
-                                                                                                                    style="font-family: 'DM Sans', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 140%; letter-spacing: -0.03em; font-weight: 400;"
-                                                                                                                    class="pc-w620-font-size-16px pc-w620-line-height-20px">
-                                                                                                                </span>
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                </td>
-                                                                                            </tr>
-                                                                                        </table>
-                                                                                    </th>
-                                                                                </tr>
-                                                                                <tr>
                                                                                     <th valign="top"
                                                                                         class="pc-w620-align-left"
                                                                                         align="left"

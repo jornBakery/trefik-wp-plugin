@@ -6,8 +6,6 @@ use \WP_ERROR;
 
 class StudentApi extends ApiBase {
 
-    protected string $api_base_url = TREFIK_WIXMO_API_BASE_URL;
-
     /**
      * Create student
      * @param array $data payload per API spec

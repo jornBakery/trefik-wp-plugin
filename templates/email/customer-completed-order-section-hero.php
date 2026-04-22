@@ -67,7 +67,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         <div class="pc-font-alt" style="text-decoration: none;">
                         <div style="font-size:14px;mso-line-height-alt:19.6px;line-height:19.6px;text-align:center;text-align-last:center;color:#001942;letter-spacing:0px;font-weight:400;font-style:normal;">
                             <div><span style="font-family: 'DM Sans', Arial, Helvetica, sans-serif; font-size: 14px; line-height: 140%;" class="pc-w620-font-size-14px pc-w620-line-height-140pc">
-                                <?php esc_html_e( 'Goed Nieuws! Je bestelling is afgerond. Je kunt je nu registreren in de online leeromeving. Onderin deze mail kan je je licentie-code(s) vinden. Deze kan je invoeren zodra je bent ingelogd in de leeromgeving.', 'trefik' ); ?>
+                                <?php esc_html_e( 'Goed nieuws! Je bestelling is afgerond. Je kunt je nu registreren in de online leeromgeving. Gebruik de knop hieronder om direct naar de leeromgeving te gaan.', 'trefik' ); ?>
                             </span>
                             </div>
                         </div>

@@ -33,7 +33,6 @@ class Plugin {
         (new WooEmailHooks())->register_hooks();
         if (defined('DOING_AJAX') && DOING_AJAX) {
             (new \Trefik\Ajax\CartAjaxHandler())->register_hooks();
-            (new \Trefik\Integrations\Elementor\LicenseRecoveryFormHandler())->register_hooks();
         }
     }
 }
