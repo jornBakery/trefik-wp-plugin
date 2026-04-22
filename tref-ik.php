@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Tref-ik
  * Description: Essential plugin for Tref-ik.
- * Version: 2.0.3
+ * Version: 2.1.0
  * Author: App King
  */
 
