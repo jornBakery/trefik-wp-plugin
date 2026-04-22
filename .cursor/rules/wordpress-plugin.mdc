@@ -1,21 +1,36 @@
 ---
-description: Core rules for this custom WordPress plugin
-globs: ["**/*"]
+description: General baseline rules for WordPress plugin development
+globs: ["**/*.php"]
 ---
 
-# Scope
+This is a WordPress plugin project.
 
-This project is a custom WordPress plugin.
+## Scope
 
-- Only edit files in this plugin repository.
-- Never modify WordPress core, themes, or other plugins.
-- Prefer minimal, targeted changes.
-- Preserve existing architecture unless explicitly asked to refactor.
-- Explain which files will change before making significant edits.
+- Only modify files inside this plugin
+- Never modify:
+  - WordPress core
+  - WooCommerce core
+  - Themes
+  - Other plugins
 
-# WordPress standards
+## General Standards
 
-- Sanitize input.
-- Escape output.
-- Check capabilities and nonces where relevant.
-- Use hooks/filters/actions in a WordPress-native way.
+- Follow WordPress best practices
+- Follow existing project architecture and conventions
+- Prefer minimal, targeted changes over large rewrites
+
+## Hooks & Extensibility
+
+- Prefer hooks (actions/filters) over direct overrides
+- Extend existing behavior instead of replacing it
+
+## Safety
+
+- Do not introduce breaking changes without clear reason
+- Avoid side effects that impact global site behavior
+
+## Responsibility
+
+- Keep changes scoped to the task
+- Do not assume unrelated parts of the plugin should be modified
