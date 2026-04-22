@@ -1,0 +1,30 @@
+---
+description: Wixmo API integration rules
+globs: ["**/*.php"]
+---
+
+This plugin integrates with the Wixmo API.
+
+Rules:
+
+- Do NOT break existing Wixmo integration
+- Reuse existing API classes and services
+- Do NOT create duplicate API layers
+
+- Respect:
+  - Authentication flow
+  - Request structure
+  - Response handling
+
+- Only modify Wixmo-related code when explicitly required
+
+- Keep API logic separated from:
+  - UI
+  - WooCommerce presentation logic
+
+- Add logging carefully when needed
+- Handle API errors predictably
+
+- Always analyze existing implementation before making changes
+
+- Maintain backward compatibility

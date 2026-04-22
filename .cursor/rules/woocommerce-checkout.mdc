@@ -1,0 +1,129 @@
+---
+description: WooCommerce checkout hooks and flow rules
+globs: ["**/*.php"]
+---
+
+This project contains custom logic for the WooCommerce checkout.
+
+The checkout flow is critical and must remain stable.
+
+## Core Rules
+
+- Do NOT break the checkout flow
+- Do NOT remove or override core WooCommerce behavior unless explicitly required
+- Always prefer hooks, filters, and actions over overrides
+
+---
+
+## Allowed Approach
+
+When modifying checkout behavior:
+
+- Use WooCommerce hooks such as:
+  - woocommerce_checkout_fields
+  - woocommerce_after_checkout_validation
+  - woocommerce_checkout_create_order
+  - woocommerce_checkout_update_order_meta
+  - woocommerce_before_checkout_form
+  - woocommerce_after_checkout_form
+
+- Extend behavior instead of replacing it
+
+---
+
+## Validation & Data Handling
+
+- Always validate checkout data properly
+- Sanitize all incoming data
+- Never trust raw $_POST data
+
+- Use:
+  - sanitize_text_field
+  - wc_clean
+  - appropriate sanitization functions
+
+---
+
+## Security
+
+- Use nonces where required
+- Validate user permissions if needed
+- Prevent manipulation of checkout data
+
+---
+
+## Order Handling
+
+When interacting with orders:
+
+- Use WooCommerce APIs (WC_Order)
+- Do NOT manipulate database directly
+
+- Prefer:
+  - $order->update_meta_data()
+  - $order->get_meta()
+  - $order->save()
+
+---
+
+## Wixmo Integration
+
+If checkout triggers Wixmo API:
+
+- Ensure API calls do NOT block checkout unnecessarily
+- Handle failures gracefully
+- Do NOT break order creation if Wixmo fails
+- Log errors instead of stopping checkout
+
+---
+
+## Performance
+
+- Avoid heavy logic during checkout
+- Avoid external API calls that delay the user experience
+- Prefer async or deferred processing if possible
+
+---
+
+## UX Stability
+
+- Do NOT break:
+  - Payment flow
+  - Redirects
+  - Thank you page
+
+- Always ensure:
+  - Checkout completes successfully
+  - Orders are created correctly
+
+---
+
+## Error Handling
+
+- Never throw fatal errors in checkout
+- Fail gracefully
+- Use notices where appropriate:
+  - wc_add_notice()
+
+---
+
+## Change Strategy
+
+When making changes:
+
+1. Keep changes minimal
+2. Only modify relevant hooks
+3. Avoid side effects
+4. Test impact on full checkout flow
+
+---
+
+## Critical Reminder
+
+Checkout is revenue-critical.
+
+Any change must:
+- Be safe
+- Be minimal
+- Be reversible
+- Not interrupt order processing

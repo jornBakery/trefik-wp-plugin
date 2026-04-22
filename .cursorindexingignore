@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/**
+vendor/**
+
+# Builds
+dist/**
+build/**
+
+# Minified files
+*.min.js
+*.min.css
+
+# Logs
+*.log
+
+# WordPress noise
+wp-content/uploads/**
+wp-content/cache/**
+
+# Large assets
+*.zip
+*.tar
+*.gz
+*.mp4
+*.jpg
+*.png

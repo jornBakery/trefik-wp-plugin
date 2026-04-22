@@ -1,0 +1,21 @@
+---
+description: Core rules for this custom WordPress plugin
+globs: ["**/*"]
+---
+
+# Scope
+
+This project is a custom WordPress plugin.
+
+- Only edit files in this plugin repository.
+- Never modify WordPress core, themes, or other plugins.
+- Prefer minimal, targeted changes.
+- Preserve existing architecture unless explicitly asked to refactor.
+- Explain which files will change before making significant edits.
+
+# WordPress standards
+
+- Sanitize input.
+- Escape output.
+- Check capabilities and nonces where relevant.
+- Use hooks/filters/actions in a WordPress-native way.

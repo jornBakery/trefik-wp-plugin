@@ -1,0 +1,43 @@
+---
+description: PHP architecture and structure rules
+globs: ["**/*.php"]
+---
+
+PHP Architecture Rules:
+
+- Follow PSR-4 namespace structure
+- Follow PSR-12 formatting
+
+- Use the existing autoloader:
+  ./src/Autoloader.php
+
+- Place all classes inside:
+  ./includes
+
+- Do NOT use manual require/include for classes
+
+- Keep classes:
+  - Small
+  - Focused
+  - Single responsibility
+
+- Reuse existing classes/helpers before creating new ones
+
+- Avoid:
+  - Large rewrites
+  - Duplicate logic
+  - Unnecessary abstractions
+
+- Maintain naming consistency:
+  - Classes
+  - Methods
+  - Namespaces
+
+- Keep logic separated:
+  - Business logic
+  - API logic
+  - UI / presentation logic
+
+- Prefer composition over inheritance where possible
+
+- Write predictable and maintainable code

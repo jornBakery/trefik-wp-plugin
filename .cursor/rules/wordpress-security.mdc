@@ -1,0 +1,10 @@
+---
+description: Security rules for admin, ajax and REST work
+globs: ["**/*.php", "**/*.js"]
+---
+
+- Validate permissions for admin actions.
+- Use nonces for state-changing actions.
+- Sanitize request data.
+- Escape rendered output.
+- Avoid trusting raw $_GET, $_POST, $_REQUEST values.

@@ -1,0 +1,36 @@
+---
+description: WordPress and WooCommerce plugin rules
+globs: ["**/*.php"]
+---
+
+This project is a custom WordPress / WooCommerce plugin for trefik.nl.
+
+Rules:
+
+- Only modify files inside this plugin
+- Never modify WordPress core, WooCommerce core, themes, or other plugins
+
+- Follow PSR-4 (namespaces)
+- Follow PSR-12 (formatting)
+
+- Respect the autoloader in ./src/Autoloader.php
+- All classes must be loaded from ./includes
+
+- Prefer hooks, filters, and WooCommerce extension points over overrides
+
+- Always:
+  - Sanitize input
+  - Escape output
+  - Use nonces where needed
+  - Check capabilities
+
+- Keep changes minimal and targeted
+- Do not refactor large parts unless explicitly requested
+
+- Be careful with:
+  - Checkout flow
+  - Cart logic
+  - Orders
+  - Product data
+
+- Maintain compatibility with existing plugin behavior

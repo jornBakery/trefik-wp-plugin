@@ -1,0 +1,35 @@
+# WordPress core
+wp-admin/**
+wp-includes/**
+
+# Andere plugins (alles behalve deze plugin)
+wp-content/plugins/**
+!wp-content/plugins/tref-ik/**
+
+# Themes
+wp-content/themes/**
+
+# Uploads / cache
+wp-content/uploads/**
+wp-content/cache/**
+wp-content/backups/**
+
+# Logs
+*.log
+logs/**
+
+# Node / build
+node_modules/**
+dist/**
+build/**
+
+# Vendor (indien aanwezig)
+vendor/**
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
