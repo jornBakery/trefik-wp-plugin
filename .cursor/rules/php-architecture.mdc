@@ -11,8 +11,18 @@ PHP Architecture Rules:
 - Use the existing autoloader:
   ./src/Autoloader.php
 
+- Namespace root is:
+  Trefik\
+
 - Place all classes inside:
   ./includes
+
+- Namespace and file path must match exactly
+
+Examples:
+- Trefik\Core\Plugin -> includes/Core/Plugin.php
+- Trefik\Ajax\CartAjaxHandler -> includes/Ajax/CartAjaxHandler.php
+- Trefik\Integrations\Wixmo\Api\StudentApi -> includes/Integrations/Wixmo/Api/StudentApi.php
 
 - Do NOT use manual require/include for classes
 
@@ -23,21 +33,44 @@ PHP Architecture Rules:
 
 - Reuse existing classes/helpers before creating new ones
 
+- Prefer existing architecture in:
+  - Core
+  - Ajax
+  - Admin
+  - Frontend
+  - Shortcodes
+  - Integrations
+
 - Avoid:
   - Large rewrites
   - Duplicate logic
   - Unnecessary abstractions
+  - New utility layers without clear need
+  - Random helper classes when existing helpers/config/base classes already exist
 
 - Maintain naming consistency:
   - Classes
   - Methods
   - Namespaces
+  - Integration folders
 
 - Keep logic separated:
   - Business logic
   - API logic
   - UI / presentation logic
+  - AJAX request handling
+  - Hook registration / bootstrap responsibilities
 
-- Prefer composition over inheritance where possible
+- Prefer composition over inheritance where practical
 
-- Write predictable and maintainable code
+- Before expanding existing code, first verify whether the class is actively used through:
+  - bootstrap logic
+  - instantiation
+  - hook registration
+  - register_hooks() calls
+
+- Do NOT assume that existing classes are active just because they exist in the repository
+
+- Treat commented-out or legacy code as inactive unless explicitly instructed otherwise
+
+- Write predictable, maintainable, production-minded code

@@ -5,31 +5,37 @@ globs: ["**/*.php"]
 
 This project contains custom logic for the WooCommerce checkout.
 
-The checkout flow is critical and must remain stable.
+The checkout flow is business-critical and must remain stable.
 
 ## Core Rules
 
 - Do NOT break the checkout flow
-- Do NOT remove or override core WooCommerce behavior unless explicitly required
+- Do NOT remove or override WooCommerce core behavior unless explicitly required
 - Always prefer hooks, filters, and actions over overrides
+- Keep checkout changes minimal and reversible
 
----
+## Existing Architecture Awareness
+
+- Before changing checkout code, first verify:
+  - where checkout hooks are registered
+  - whether the class is actively instantiated
+  - whether similar checkout behavior already exists elsewhere in the plugin
+
+- Reuse existing checkout integration classes instead of creating duplicate checkout logic
 
 ## Allowed Approach
 
-When modifying checkout behavior:
+When modifying checkout behavior, prefer WooCommerce hooks such as:
+- woocommerce_checkout_fields
+- woocommerce_after_checkout_validation
+- woocommerce_checkout_create_order
+- woocommerce_checkout_update_order_meta
+- woocommerce_before_checkout_form
+- woocommerce_after_checkout_form
+- woocommerce_review_order_before_submit
+- woocommerce_thankyou
 
-- Use WooCommerce hooks such as:
-  - woocommerce_checkout_fields
-  - woocommerce_after_checkout_validation
-  - woocommerce_checkout_create_order
-  - woocommerce_checkout_update_order_meta
-  - woocommerce_before_checkout_form
-  - woocommerce_after_checkout_form
-
-- Extend behavior instead of replacing it
-
----
+Extend behavior instead of replacing it.
 
 ## Validation & Data Handling
 
@@ -37,12 +43,17 @@ When modifying checkout behavior:
 - Sanitize all incoming data
 - Never trust raw $_POST data
 
-- Use:
+- Read incoming values defensively:
+  - use isset()
+  - use null coalescing where appropriate
+  - sanitize before use
+  - avoid assuming fields always exist
+
+- Prefer:
   - sanitize_text_field
   - wc_clean
-  - appropriate sanitization functions
-
----
+  - sanitize_email
+  - appropriate field-specific sanitizers
 
 ## Security
 
@@ -50,53 +61,44 @@ When modifying checkout behavior:
 - Validate user permissions if needed
 - Prevent manipulation of checkout data
 
----
-
 ## Order Handling
 
 When interacting with orders:
-
 - Use WooCommerce APIs (WC_Order)
-- Do NOT manipulate database directly
+- Do NOT manipulate database tables directly
 
-- Prefer:
-  - $order->update_meta_data()
-  - $order->get_meta()
-  - $order->save()
-
----
+Prefer:
+- $order->update_meta_data()
+- $order->get_meta()
+- $order->save()
 
 ## Wixmo Integration
 
-If checkout triggers Wixmo API:
-
-- Ensure API calls do NOT block checkout unnecessarily
+If checkout triggers Wixmo API logic:
+- Ensure Wixmo calls do NOT break order creation unless functionally required
 - Handle failures gracefully
-- Do NOT break order creation if Wixmo fails
-- Log errors instead of stopping checkout
-
----
+- Prefer logging and controlled failure paths over fatal interruption
+- Never expose sensitive API information to the customer
 
 ## Performance
 
 - Avoid heavy logic during checkout
-- Avoid external API calls that delay the user experience
-- Prefer async or deferred processing if possible
-
----
+- Avoid expensive external requests in blocking checkout steps unless necessary
+- Prefer deferred or post-order processing when possible
 
 ## UX Stability
 
 - Do NOT break:
-  - Payment flow
-  - Redirects
-  - Thank you page
+  - field rendering
+  - payment flow
+  - redirects
+  - thank you page
+  - existing CSS class hooks or checkout layout expectations
 
 - Always ensure:
-  - Checkout completes successfully
-  - Orders are created correctly
-
----
+  - checkout completes successfully
+  - orders are created correctly
+  - notices remain understandable for the user
 
 ## Error Handling
 
@@ -105,25 +107,22 @@ If checkout triggers Wixmo API:
 - Use notices where appropriate:
   - wc_add_notice()
 
----
-
 ## Change Strategy
 
-When making changes:
-
+When making checkout changes:
 1. Keep changes minimal
 2. Only modify relevant hooks
 3. Avoid side effects
-4. Test impact on full checkout flow
-
----
+4. Validate and sanitize all request data
+5. Check full checkout impact before adding extra logic
 
 ## Critical Reminder
 
 Checkout is revenue-critical.
 
-Any change must:
-- Be safe
-- Be minimal
-- Be reversible
-- Not interrupt order processing
+Any change must be:
+- safe
+- minimal
+- maintainable
+- reversible
+- compatible with order processing

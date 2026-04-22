@@ -10,27 +10,52 @@ Rules:
 - Only modify files inside this plugin
 - Never modify WordPress core, WooCommerce core, themes, or other plugins
 
-- Follow PSR-4 (namespaces)
-- Follow PSR-12 (formatting)
+- Follow PSR-4
+- Follow PSR-12
 
 - Respect the autoloader in ./src/Autoloader.php
+- Namespace root is Trefik\
 - All classes must be loaded from ./includes
 
 - Prefer hooks, filters, and WooCommerce extension points over overrides
+- Prefer extending existing behavior over replacing core behavior
+
+- Existing WooCommerce integration classes may act as hook containers
+- Before adding new WooCommerce behavior, first check whether there is already:
+  - an existing integration class
+  - an existing hook registration method
+  - an existing register_hooks() entry point
+
+- Avoid duplicating checkout/cart/order logic in a second class if existing WooCommerce integration classes already cover that concern
 
 - Always:
   - Sanitize input
   - Escape output
   - Use nonces where needed
-  - Check capabilities
+  - Check capabilities where needed
+
+- Respect WooCommerce lifecycle:
+  - cart initialization
+  - session availability
+  - checkout validation
+  - order creation
+  - thank you page / post-checkout flow
 
 - Keep changes minimal and targeted
 - Do not refactor large parts unless explicitly requested
 
-- Be careful with:
+- Be especially careful with:
   - Checkout flow
   - Cart logic
   - Orders
   - Product data
+  - User account related flows
+  - Email hooks
+  - AJAX-driven cart/checkout updates
 
 - Maintain compatibility with existing plugin behavior
+
+- Never introduce direct database manipulation for WooCommerce entities when WooCommerce APIs exist
+- Use WooCommerce / WordPress APIs for orders, carts, notices, meta and settings
+
+- Do not assume that a WooCommerce-related class is active unless you verify that it is actually registered in the plugin bootstrap

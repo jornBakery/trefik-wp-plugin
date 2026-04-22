@@ -1,0 +1,90 @@
+---
+description: Shortcode rendering and output rules
+globs: ["includes/Shortcodes/**/*.php"]
+---
+
+This project contains WordPress shortcodes used for frontend rendering.
+
+Shortcodes must be safe, predictable and performant.
+
+## Core Rules
+
+- Shortcodes are responsible for rendering output, not business logic
+- Keep shortcode classes focused on presentation
+- Do NOT embed complex logic directly in shortcode render methods
+
+## Output Strategy
+
+- Always return output (never echo directly unless explicitly required)
+- Prefer output buffering when needed:
+  - ob_start()
+  - ob_get_clean()
+
+- Keep output structure clean and readable
+- Avoid large inline HTML strings when possible
+
+## Security
+
+- Always escape output:
+  - esc_html()
+  - esc_attr()
+  - esc_url()
+  - wp_kses_post() (where HTML is allowed)
+
+- Never trust input attributes directly
+- Sanitize all shortcode attributes before use
+
+## Attribute Handling
+
+- Define default attributes using shortcode_atts()
+- Validate and sanitize attributes before using them
+- Do not assume attributes exist
+
+## Separation of Concerns
+
+- Business logic belongs in:
+  - Core classes
+  - Services
+  - Integration classes
+
+- Shortcodes should:
+  - call existing services/helpers
+  - render the result
+
+- Do NOT duplicate logic already present elsewhere in the plugin
+
+## Performance
+
+- Avoid heavy processing inside shortcode rendering
+- Avoid unnecessary API calls inside shortcodes
+- Cache results if rendering depends on expensive operations
+
+## WooCommerce Awareness
+
+If shortcode interacts with WooCommerce:
+- Check cart/session availability before using cart data
+- Do not break cart or checkout flow
+- Avoid side effects in rendering
+
+## Error Handling
+
+- Fail gracefully
+- Do not output raw PHP errors
+- Return empty or fallback output where appropriate
+
+## Change Strategy
+
+Before modifying a shortcode:
+1. Check if logic already exists elsewhere
+2. Keep rendering separate from logic
+3. Keep output safe and escaped
+4. Keep changes minimal
+
+## Critical Reminder
+
+Shortcodes run in frontend context and may be used anywhere.
+
+Always:
+- sanitize input
+- escape output
+- keep rendering predictable

@@ -1,0 +1,80 @@
+---
+description: Plugin bootstrap, constants, wiring and hook registration rules
+globs: ["tref-ik.php", "includes/Core/Plugin.php", "includes/Core/**/*.php"]
+---
+
+This project has a clear plugin bootstrap and hook registration flow.
+
+Bootstrap and wiring code are high-impact areas and must remain stable.
+
+## Core Rules
+
+- Be careful with plugin initialization order
+- Do not introduce breaking changes in bootstrap flow
+- Do not assume that all classes in the repository are automatically active
+
+## Active Code Verification
+
+Before building on an existing class, verify whether it is actually used by checking:
+- instantiation in bootstrap code
+- registration in includes/Core/Plugin.php
+- register_hooks() usage
+- WordPress add_action / add_filter attachment paths
+
+Treat inactive or commented-out code as non-authoritative.
+
+## Responsibilities
+
+Bootstrap code should handle:
+- plugin setup
+- constants / configuration wiring
+- service instantiation
+- hook registration
+- integration wiring
+
+Bootstrap code should NOT become a dumping ground for business logic.
+
+## Hook Registration
+
+- Prefer explicit hook registration in dedicated classes
+- Keep wiring readable and centralized
+- Avoid scattering the same concern across multiple bootstrap locations
+- Reuse existing hook containers where possible
+
+## Constants / Configuration
+
+- Avoid adding new hardcoded secrets, tokens or credentials
+- Do not expand insecure constant-based secret storage patterns
+- Prefer indirection through configuration layers when possible
+
+## Stability
+
+Be extra careful with changes affecting:
+- plugin load order
+- conditional class loading
+- AJAX-only initialization
+- admin vs frontend initialization
+- WooCommerce-dependent initialization
+- email hooks
+- checkout/cart related integrations
+
+## Architecture
+
+- Keep bootstrap small and orchestration-focused
+- Put functional logic into dedicated classes
+- Do not duplicate registration logic across files
+- Preserve backward compatibility unless explicitly instructed otherwise
+
+## Change Strategy
+
+Before changing bootstrap:
+1. Identify what is currently instantiated
+2. Verify which hooks are currently active
+3. Confirm whether the target class is active or dead code
+4. Make the smallest safe change possible
+
+## Critical Reminder
+
+Small bootstrap mistakes can disable entire plugin features.
+
+Be conservative and explicit.

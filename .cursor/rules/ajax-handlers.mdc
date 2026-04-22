@@ -1,0 +1,83 @@
+---
+description: AJAX handler rules for WordPress, WooCommerce and plugin-specific endpoints
+globs: ["includes/Ajax/**/*.php", "**/*Ajax*.php"]
+---
+
+This project contains AJAX handlers that may affect cart, checkout, account or frontend behavior.
+
+AJAX endpoints must be safe, predictable and resilient.
+
+## Core Rules
+
+- Always validate and sanitize incoming request data
+- Never trust raw $_POST, $_GET or $_REQUEST values
+- Prefer early validation and early returns for invalid requests
+- Keep AJAX handlers focused on request/response orchestration
+
+## Security
+
+- Use nonce verification where relevant
+- If the action changes state, verify intent explicitly
+- Check permissions where required
+- Do not expose internal stack traces, secrets or sensitive data in responses
+
+## Response Strategy
+
+- Use consistent JSON responses
+- Prefer:
+  - wp_send_json_success()
+  - wp_send_json_error()
+
+- Return predictable response structures
+- Do not echo arbitrary content before JSON responses
+- Do not leave handlers without a clear response path
+
+## WooCommerce Awareness
+
+If AJAX logic touches WooCommerce:
+- Verify cart/session availability before using cart methods
+- Handle guest and logged-in contexts deliberately
+- Do not assume cart/session is always initialized
+- Avoid breaking cart totals, fragments or checkout state
+
+## Error Handling
+
+- Never allow fatal errors in AJAX handlers
+- Handle invalid input gracefully
+- Return useful but safe error messages
+- Do not leak tokens, secrets, raw API responses or debug output
+
+## Structure
+
+- Keep business logic out of raw AJAX methods when possible
+- Reuse existing services/helpers instead of duplicating logic
+- Keep request parsing, validation and response formatting readable and minimal
+
+## Data Handling
+
+- Sanitize by field type
+- Validate required fields explicitly
+- Use wp_unslash() where appropriate before sanitization
+- Do not pass raw request arrays deeper into business logic unless explicitly normalized first
+
+## External Integrations
+
+If AJAX triggers Wixmo or other external API calls:
+- Handle timeouts and failures gracefully
+- Do not block critical frontend experience unnecessarily
+- Avoid returning raw third-party payloads to the browser
+- Log safely and minimally
+
+## Change Strategy
+
+Before modifying an AJAX handler:
+1. Verify where the action is registered
+2. Check whether both logged-in and logged-out variants exist
+3. Confirm whether WooCommerce cart/session is required
+4. Keep changes small and localized
+
+## Critical Reminder
+
+AJAX code often runs in partial frontend state.
+
+Be defensive, minimal and explicit.

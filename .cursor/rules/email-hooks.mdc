@@ -1,0 +1,97 @@
+---
+description: WooCommerce email hooks and custom email logic rules
+globs: ["includes/Integrations/WooCommerce/**/*Email*.php", "**/*Email*.php"]
+---
+
+This project contains custom WooCommerce email logic.
+
+Emails are business-critical and must remain stable and accurate.
+
+## Core Rules
+
+- Do NOT break existing WooCommerce email flow
+- Do NOT remove core email triggers
+- Always extend behavior using hooks and filters
+
+## Architecture Awareness
+
+- Email logic is typically implemented via:
+  - hook container classes
+  - WooCommerce email filters/actions
+
+- Before adding new email logic:
+  - check if existing email hooks already exist
+  - reuse existing classes instead of duplicating logic
+
+## Allowed Hooks
+
+Prefer WooCommerce email hooks such as:
+- woocommerce_email_order_meta
+- woocommerce_email_before_order_table
+- woocommerce_email_after_order_table
+- woocommerce_email_headers
+- woocommerce_email_recipient_*
+- woocommerce_email_subject_*
+
+## Data Handling
+
+- Always sanitize data before processing
+- Always escape output before rendering in email templates
+
+- Use:
+  - esc_html()
+  - esc_attr()
+  - wp_kses_post()
+
+## Order Data
+
+When using order data:
+- Use WC_Order API
+- Do NOT access database directly
+
+Prefer:
+- $order->get_meta()
+- $order->get_items()
+- $order->get_billing_email()
+
+## Wixmo Integration
+
+If emails include Wixmo-related data:
+- Ensure data is already validated and safe
+- Do NOT expose sensitive API data
+- Do NOT include tokens or internal identifiers
+
+## HTML Output
+
+- Keep email HTML simple and compatible
+- Avoid complex frontend styling
+- Ensure output works in common email clients
+
+## Error Handling
+
+- Never break email sending with fatal errors
+- Fail silently where needed
+- Do not expose internal errors in email content
+
+## Performance
+
+- Avoid heavy processing inside email hooks
+- Do not trigger slow API calls during email rendering
+
+## Change Strategy
+
+Before modifying email logic:
+1. Check which hooks are currently used
+2. Verify where the email is triggered
+3. Keep changes minimal
+4. Preserve existing email content structure
+
+## Critical Reminder
+
+Emails are customer-facing and legally sensitive.
+
+Always ensure:
+- correctness
+- clarity
+- safety
+- consistency

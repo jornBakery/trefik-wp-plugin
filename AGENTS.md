@@ -3,148 +3,242 @@
 ## Project Context
 
 Dit project is een custom WordPress / WooCommerce plugin voor **trefik.nl**.
-De plugin wordt gebruikt om uiteenlopende onderdelen van de webshop functioneel en visueel te customizen.
 
-De plugin bevat ook een integratie met de **Wixmo API**.
-Wixmo is een ELP waarin via trefik.nl aangeschafte pakketten verwerkt of gekoppeld kunnen worden.
+De plugin wordt gebruikt om functionaliteit, gedrag en presentatie van de webshop te customizen.
+Daarnaast bevat de plugin een integratie met de **Wixmo API**.
+
+Wixmo is een ELP waarin via trefik.nl aangeschafte pakketten verwerkt, gekoppeld of geactiveerd kunnen worden.
+
+---
 
 ## Scope
 
-Werk **uitsluitend** binnen deze plugin.
+Werk **uitsluitend binnen deze plugin**.
 
-- Pas nooit WordPress core aan
-- Pas nooit WooCommerce core aan
-- Pas nooit andere plugins aan
-- Pas nooit het actieve theme aan, tenzij daar expliciet om gevraagd wordt
-- Maak geen wijzigingen buiten deze plugin-map
-- Focus alleen op code die direct relevant is voor de gevraagde wijziging
+NIET toegestaan:
+- WordPress core aanpassen
+- WooCommerce core aanpassen
+- Andere plugins aanpassen
+- Themes aanpassen
+- Bestanden buiten deze plugin wijzigen
+- Serverconfiguratie wijzigen
+- Database-schema direct aanpassen zonder expliciete opdracht
+
+---
+
+## Repository Structure Awareness
+
+Deze plugin heeft meerdere functionele domeinen. Houd altijd rekening met de bestaande structuur.
+
+Belangrijke onderdelen:
+- `tref-ik.php` → plugin bootstrap / constants / initialisatie
+- `src/Autoloader.php` → autoloader
+- `includes/Admin` → admin functionaliteit
+- `includes/Ajax` → AJAX handlers
+- `includes/Core` → kernlogica / bootstrap / helpers / config
+- `includes/Frontend` → frontend hooks / rendering
+- `includes/Shortcodes` → shortcodes
+- `includes/Integrations/WooCommerce` → WooCommerce integraties
+- `includes/Integrations/Wixmo` → Wixmo API integratie
+- `includes/Integrations/Elementor` → Elementor gerelateerde integratie
+- `includes/Integrations/Curl` → request/transport gerelateerde code
+
+Werk altijd binnen het meest logische domein.
+Voeg geen code toe in een willekeurige map als daar al een bestaande structuur voor bestaat.
+
+---
+
+## Active Code Awareness
+
+Ga **nooit automatisch ervan uit** dat een bestaande class ook daadwerkelijk actief gebruikt wordt.
+
+Controleer altijd eerst:
+- of de class ergens geïnstantieerd wordt
+- of de class via `register_hooks()` wordt gekoppeld
+- of de class via `includes/Core/Plugin.php` of andere bootstrap-logica wordt geladen
+- of de code legacy / commented-out / ongebruikt is
+
+Gebruik bestaande actieve codepaden als bron van waarheid.
+
+Behandel:
+- commented-out code
+- oude experimenten
+- ongebruikte classes
+- legacy implementaties
+
+als **niet-actief**, tenzij expliciet anders gevraagd.
+
+---
 
 ## Architecture
-
-Volg altijd de bestaande architectuur van deze plugin.
 
 ### Autoloading
 
 - De autoloader staat in `./src/Autoloader.php`
-- Deze autoloader laadt alle classes en namespaces vanuit `./includes`
-- Houd bij nieuwe classes en namespaces altijd rekening met deze autoload-structuur
-- Gebruik geen losse `require` of `include` statements voor classes als dat via de bestaande autoloader opgelost hoort te worden
+- De namespace root is `Trefik\`
+- Classes worden geladen vanuit `./includes`
 
-### Coding Standards
+Regels:
+- Gebruik PSR-4 namespaces
+- Namespace en bestandspad moeten exact op elkaar aansluiten
+- Plaats nieuwe classes in `/includes`
+- Gebruik geen handmatige `require` of `include` voor classes
+- Respecteer de bestaande namespace-structuur
 
-Volg altijd:
+Voorbeeld:
+- `Trefik\Core\Plugin` → `includes/Core/Plugin.php`
+- `Trefik\Ajax\CartAjaxHandler` → `includes/Ajax/CartAjaxHandler.php`
 
-- **PSR-4** voor namespaces en class loading
-- **PSR-12** voor formatting en code style
+---
+
+## Coding Standards
+
+Verplicht:
+- PSR-4
+- PSR-12
 
 Aanvullend:
+- Kleine, duidelijke classes
+- Single responsibility per class
+- Geen onnodige abstractie
+- Geen onnodige nieuwe service-lagen
+- Bestaande structuur behouden waar mogelijk
+- Geen grote refactors tenzij expliciet gevraagd
 
-- Houd classes klein en logisch gescheiden
-- Gebruik duidelijke verantwoordelijkheden per class
-- Behoud bestaande naamgeving en structuur waar mogelijk
-- Refactor alleen als dat echt nodig is voor de taak
+---
 
 ## WordPress / WooCommerce Best Practices
 
-Bij iedere wijziging:
+- Gebruik hooks, filters en actions
+- Gebruik WooCommerce extensiepunten
+- Vermijd overrides als hooks mogelijk zijn
+- Gebruik WordPress-native patronen
+- Respecteer lifecycle van requests, cart, checkout, sessions en order creation
 
-- Werk op een WordPress-native manier
-- Gebruik hooks, filters, actions en WooCommerce extensiepunten waar passend
-- Vermijd harde overrides als een hook/filter mogelijk is
-- Houd rekening met compatibiliteit en onderhoudbaarheid
+Wanneer code checkout, cart of order flow raakt:
+- wees extra defensief
+- voorkom side effects
+- maak wijzigingen minimaal en gericht
 
-### Security
+---
 
-Pas altijd de juiste WordPress security-principes toe:
+## Security
 
+Altijd toepassen:
 - Sanitize input
 - Escape output
-- Controleer capabilities waar nodig
-- Gebruik nonces bij state-changing acties
-- Vertrouw nooit direct op ruwe `$_POST`, `$_GET`, `$_REQUEST` of externe API-data
+- Gebruik nonces
+- Check capabilities
+- Vertrouw nooit direct op `$_GET`, `$_POST`, `$_REQUEST`, `$_COOKIE` of externe API data
+- Log nooit gevoelige data ongefilterd
+
+---
+
+## Secrets / Credentials / Configuration
+
+Voeg **nooit** secrets, client secrets, access tokens, bearer tokens, API keys of wachtwoorden toe aan versioned plugin code.
+
+Verboden:
+- hardcoded credentials in PHP files
+- secrets in constants binnen de plugin
+- logging van tokens of gevoelige request headers
+
+Voorkeur:
+- configuratie buiten de codebase
+- `wp-config.php`
+- environment variables
+- beveiligde settings-opslag wanneer expliciet gewenst
+
+Als bestaande code al hardcoded secrets bevat:
+- breid dat patroon niet verder uit
+- stel liever een migratie naar veilige configuratie voor
+- behoud backward compatibility tenzij expliciet om wijziging gevraagd wordt
+
+---
 
 ## Wixmo API Integration
 
-Deze plugin bevat een integratie met de **Wixmo API**.
+- Breek bestaande Wixmo integratie NIET
+- Gebruik bestaande API classes, base classes, clients en response/error patronen
+- Respecteer bestaande request flows
+- Respecteer authenticatie en payloadstructuren
+- Maak geen dubbele API implementaties
+- Activeer geen legacy of commented-out Wixmo code zonder expliciete opdracht
 
-Belangrijke uitgangspunten:
+Bij wijzigingen:
+- analyseer eerst welke Wixmo-klassen al actief gebruikt worden
+- hergebruik bestaande lagen
+- houd API logica gescheiden van UI en WooCommerce presentatie
+- voeg foutafhandeling zorgvuldig toe
+- laat Wixmo-fouten niet onnodig kritische WooCommerce flows blokkeren, tenzij dat functioneel vereist is
 
-- Breek bestaande Wixmo-koppelingen niet
-- Respecteer bestaande request flows, authenticatie en payload-structuren
-- Wijzig Wixmo-gerelateerde logica alleen als dat direct onderdeel is van de opdracht
-- Houd API-code gescheiden van WooCommerce- of UI-logica waar mogelijk
-- Voeg logging en foutafhandeling zorgvuldig toe wanneer relevant
-- Maak geen aannames over API responses zonder de bestaande implementatie te volgen
+---
 
-Als je Wixmo-gerelateerde code aanpast:
+## AJAX Handling
 
-- Controleer eerst welke classes/services hier al voor bestaan
-- Hergebruik bestaande API-lagen, helpers of clients
-- Voeg geen dubbele integratielaag toe als er al een patroon aanwezig is
+Voor AJAX code:
+- controleer altijd op nonce waar relevant
+- valideer input altijd
+- sanitize alle inkomende data
+- gebruik consistente JSON responses
+- houd rekening met requests van niet-ingelogde gebruikers indien van toepassing
+- check WooCommerce cart/session beschikbaarheid voordat cart logica wordt uitgevoerd
+- voorkom fatals in AJAX endpoints
+
+---
 
 ## Working Style
 
-Bij iedere taak:
+Bij elke taak:
 
-1. Bepaal eerst welke bestanden echt aangepast moeten worden
-2. Houd wijzigingen zo klein en gericht mogelijk
-3. Pas alleen relevante bestanden aan
-4. Behoud bestaande structuur tenzij expliciet om refactor gevraagd wordt
-5. Licht kort toe welke bestanden gewijzigd worden voordat grotere wijzigingen worden gedaan
+1. Bepaal welke bestanden echt aangepast moeten worden
+2. Controleer of het actieve codepaden betreft
+3. Houd wijzigingen klein en gericht
+4. Werk alleen in relevante bestanden
+5. Houd bootstrap- en hookregistratie in gedachten
+6. Licht bij grotere wijzigingen kort toe welke bestanden geraakt worden
 
-## Preferred Approach
+---
 
-Geef voorkeur aan:
+## Kritische onderdelen
 
-- Kleine, gerichte wijzigingen
-- Hergebruik van bestaande classes en helpers
-- Duidelijke class- en namespace-structuur
-- Oplossingen die passen binnen de bestaande plugin-architectuur
-- Onderhoudbare en voorspelbare code
+Wees extra voorzichtig met:
+- plugin bootstrap
+- checkout flow
+- winkelwagen
+- orders
+- productdata
+- AJAX handlers
+- user accounts
+- Wixmo API calls
+- classes die hooks registreren
+- globale filters / sitebrede hooks
 
-Vermijd:
-
-- Grote onnodige rewrites
-- Nieuwe abstractielagen zonder duidelijke noodzaak
-- Logica dupliceren
-- Hidden side effects in WooCommerce checkout, cart, order of account flows
-
-## File / Code Awareness
-
-Let extra goed op bij wijzigingen in code die invloed kan hebben op:
-
-- WooCommerce checkout
-- Winkelwagenlogica
-- Orderverwerking
-- Productdata
-- Gebruikersaccounts
-- API-koppelingen met Wixmo
-- Hooks die sitebreed gedrag beïnvloeden
-
-Wijzig dit soort code alleen doelgericht en voorzichtig.
+---
 
 ## Output Expectations
 
-Wanneer je code genereert of wijzigt:
+- Productieklare code
+- PSR-12 formatting
+- Correcte namespaces
+- Compatibel met de autoloader
+- Geen overbodige comments
+- Geen duplicate logic
+- Geen aannames dat ongebruikte code actief is
+- Geen nieuwe secrets in code
 
-- Lever production-minded code
-- Houd code PSR-12 netjes opgemaakt
-- Zorg dat namespaces en class-locaties PSR-4-consistent zijn
-- Sluit aan op de bestaande autoloader in `./src/Autoloader.php`
-- Voeg alleen nieuwe bestanden toe als dat echt nodig is
-- Voeg geen overbodige comments toe
-- Gebruik korte, functionele toelichtingen waar nodig
+---
 
 ## Summary
 
-Dit is een custom plugin voor trefik.nl met WooCommerce-customizations en een Wixmo API-integratie.
-
-Belangrijkste regels:
-
 - Werk alleen binnen deze plugin
 - Volg PSR-4 en PSR-12
-- Respecteer de autoloader in `./src/Autoloader.php`
-- Classes en namespaces worden geladen vanuit `./includes`
-- Gebruik WordPress / WooCommerce best practices
+- Respecteer `src/Autoloader.php`
+- Namespace root is `Trefik\`
+- Classes staan in `/includes`
+- Controleer altijd of code actief gebruikt wordt
+- Respecteer bootstrap en hookregistratie
+- Breek WooCommerce checkout/cart/order flow niet
+- Breek Wixmo integratie niet
+- Voeg nooit secrets toe aan de codebase
 - Houd wijzigingen klein, veilig en gericht
-- Behoud de Wixmo-integratie en bestaande architectuur
