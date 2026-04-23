@@ -12,7 +12,7 @@
  *
  * @see     https://woocommerce.com/document/template-structure/
  * @package WooCommerce\Templates\Emails
- * @version 10.4.0
+ * @version 10.7.0
  */
 
 use Automattic\WooCommerce\Utilities\FeaturesUtil;
@@ -23,6 +23,7 @@ $margin_side = is_rtl() ? 'left' : 'right';
 
 $email_improvements_enabled = FeaturesUtil::feature_is_enabled( 'email_improvements' );
 $price_text_align           = $email_improvements_enabled ? 'right' : 'left';
+$block_email_editor_enabled = FeaturesUtil::feature_is_enabled( 'block_email_editor' );
 
 foreach ( $items as $item_id => $item ) :
 	$product       = $item->get_product();
@@ -62,7 +63,7 @@ foreach ( $items as $item_id => $item ) :
                                                         <tr>
                                                             <td class="pc-w620-spacing-15-16-0-0 pc-w620-align-left"
                                                                 valign="top"
-                                                                style="padding: 0px 20px 0px 0px; height: auto;">
+                                                                style="padding: 0px 20px 0px 0px; height: auto; vertical-align: top;">
                                                                 <?php
                                                                     /**
                                                                      * Email Order Item Thumbnail hook.

@@ -12,7 +12,7 @@
  *
  * @see https://woocommerce.com/document/template-structure/
  * @package WooCommerce\Templates\Emails
- * @version 10.6.0
+ * @version 10.7.0
  */
 
 use Automattic\WooCommerce\Utilities\FeaturesUtil;
@@ -22,6 +22,7 @@ defined( 'ABSPATH' ) || exit;
 $text_align = is_rtl() ? 'right' : 'left';
 
 $email_improvements_enabled = FeaturesUtil::feature_is_enabled( 'email_improvements' );
+$block_email_editor_enabled = FeaturesUtil::feature_is_enabled( 'block_email_editor' );
 
 /**
  * Filter whether to display the section divider in the email body.
@@ -43,7 +44,7 @@ do_action( 'woocommerce_email_before_order_table', $order, $sent_to_admin, $plai
 
 <?php
 if ( $sent_to_admin ) {
-	$before = '<a class="link" href="' . esc_url( $order->get_edit_order_url() ) . '">';
+	$before = '<a class="link" href="' . esc_url( $order->get_edit_order_url() ) . '"' . ( $block_email_editor_enabled ? ' style="text-decoration: none;"' : '' ) . '>';
 	$after  = '</a>';
 } else {
 	$before = '';
