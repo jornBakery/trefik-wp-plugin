@@ -16,7 +16,7 @@ class WooEmailHooks {
         
         add_action('trefik_email_order_completed_section_admin_order',  [$this, 'email_order_completed_section_admin_order'], 10 ,4);
 
-        // add_filter('woocommerce_email_get_template', [$this, 'email_locate_template'], 10 ,3);
+        add_filter( 'woocommerce_locate_template', [ $this, 'locate_woocommerce_template' ], 10, 3 );
 
     }
 
@@ -73,5 +73,29 @@ class WooEmailHooks {
         }
         Helper::write_log(['WooEmailHooks::include_template', "template not found: ". $template_path]);
 
+    }
+
+    /**
+     * Allow overriding WooCommerce templates from this plugin.
+     *
+     * We only target email templates (`emails/*`) and resolve them to:
+     * - {plugin}/templates/emails/*
+     *
+     * @param string $template      Located template path (WooCommerce result).
+     * @param string $template_name Template name (e.g. emails/email-header.php).
+     * @param string $template_path Template path (unused here).
+     * @return string
+     */
+    public function locate_woocommerce_template( $template, $template_name, $template_path ) {
+        if ( 0 !== strpos( (string) $template_name, 'emails/' ) ) {
+            return $template;
+        }
+
+        $plugin_candidate = Config::template_path() . $template_name;
+        if ( file_exists( $plugin_candidate ) ) {
+            return $plugin_candidate;
+        }
+
+        return $template;
     }
 }

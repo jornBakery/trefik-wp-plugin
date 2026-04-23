@@ -12,28 +12,51 @@
  *
  * @see https://woocommerce.com/document/template-structure/
  * @package WooCommerce\Templates\Emails
- * @version 3.7.0
+ * @version 10.6.0
  */
+
+use Automattic\WooCommerce\Utilities\FeaturesUtil;
 
 defined( 'ABSPATH' ) || exit;
 
 $text_align = is_rtl() ? 'right' : 'left';
 
+$email_improvements_enabled = FeaturesUtil::feature_is_enabled( 'email_improvements' );
+
+/**
+ * Filter whether to display the section divider in the email body.
+ *
+ * @since 10.6.0
+ * @param bool $display_section_divider Whether to display the section divider. Default true.
+ */
+$display_section_divider   = (bool) apply_filters( 'woocommerce_email_body_display_section_divider', true );
+$heading_class             = $email_improvements_enabled ? 'email-order-detail-heading' : '';
+$order_table_class         = $email_improvements_enabled ? 'email-order-details' : '';
+$order_total_text_align    = $email_improvements_enabled ? 'right' : 'left';
+$order_quantity_text_align = $email_improvements_enabled ? 'right' : 'left';
+
+if ( $email_improvements_enabled ) {
+	add_filter( 'woocommerce_order_shipping_to_display_shipped_via', '__return_false' );
+}
+
 do_action( 'woocommerce_email_before_order_table', $order, $sent_to_admin, $plain_text, $email ); ?>
 
-<h2>
-	<?php
-	if ( $sent_to_admin ) {
-		$before = '<a class="link" href="' . esc_url( $order->get_edit_order_url() ) . '">';
-		$after  = '</a>';
-	} else {
-		$before = '';
-		$after  = '';
-	}
+<?php
+if ( $sent_to_admin ) {
+	$before = '<a class="link" href="' . esc_url( $order->get_edit_order_url() ) . '">';
+	$after  = '</a>';
+} else {
+	$before = '';
+	$after  = '';
+}
+
+/* translators: %s: Order ID. */
+$order_number_string = __( '[Order #%s]', 'woocommerce' );
+if ( $email_improvements_enabled ) {
 	/* translators: %s: Order ID. */
-	//echo wp_kses_post( $before . sprintf( __( '[Order #%s]', 'woocommerce' ) . $after . ' (<time datetime="%s">%s</time>)', $order->get_order_number(), $order->get_date_created()->format( 'c' ), wc_format_datetime( $order->get_date_created() ) ) );
-	?>
-</h2>
+	$order_number_string = __( 'Order #%s', 'woocommerce' );
+}
+?>
 
 <tr>
     <td valign="top">
@@ -75,7 +98,7 @@ do_action( 'woocommerce_email_before_order_table', $order, $sent_to_admin, $plai
                 <div style="font-size:14px;mso-line-height-alt:19.6px;line-height:19.6px;text-align:center;text-align-last:center;color:#001942;letter-spacing:0px;font-weight:400;font-style:normal;">
                 <div>
                     <span style="font-family: 'DM Sans', Arial, Helvetica, sans-serif; font-size: 14px; line-height: 140%;" class="pc-w620-font-size-16px pc-w620-line-height-28px">
-                    <?php echo wp_kses_post( $before . sprintf( __( '[Order #%s]', 'woocommerce' ) . $after . ' (<time datetime="%s">%s</time>)', $order->get_order_number(), $order->get_date_created()->format( 'c' ), wc_format_datetime( $order->get_date_created() ) ) ); ?>
+                    <?php echo wp_kses_post( $before . sprintf( $order_number_string . $after . ' (<time datetime="%s">%s</time>)', $order->get_order_number(), $order->get_date_created()->format( 'c' ), wc_format_datetime( $order->get_date_created() ) ) ); ?>
                     </span>
                 </div>
                 </div>
@@ -87,30 +110,33 @@ do_action( 'woocommerce_email_before_order_table', $order, $sent_to_admin, $plai
             </tr>
         </table>
         <?php
+			$image_size = $email_improvements_enabled ? 48 : 32;
 			echo wc_get_email_order_items( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				$order,
 				array(
 					'show_sku'      => $sent_to_admin,
-					'show_image'    => false,
-					'image_size'    => array( 32, 32 ),
+					'show_image'    => $email_improvements_enabled,
+					'image_size'    => array( $image_size, $image_size ),
 					'plain_text'    => $plain_text,
 					'sent_to_admin' => $sent_to_admin,
 				)
 			);
         ?>
         <?php
-			$item_totals = $order->get_order_item_totals();
+			$item_totals       = $order->get_order_item_totals();
+			$item_totals_count = count( $item_totals );
 
 			if ( $item_totals ) {
 				$i = 0;
 				foreach ( $item_totals as $total ) {
-					$i++;
+					++$i;
+					$last_class = ( $i === $item_totals_count ) ? ' order-totals-last' : '';
 					?>			
 					
                     <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
                         <tr>
                         <td style="padding: 5px 0px 4px 0px;">
-                        <table class="pc-w620-tableCollapsed-0" border="0" cellpadding="0" cellspacing="0" role="presentation" bgcolor="#ffffff" style="width: 100%; background-color:#ffffff; border-radius: 10px 10px 10px 10px;">
+                        <table class="pc-w620-tableCollapsed-0 order-totals order-totals-<?php echo esc_attr( $total['type'] ?? 'unknown' ); ?><?php echo esc_attr( $last_class ); ?>" border="0" cellpadding="0" cellspacing="0" role="presentation" bgcolor="#ffffff" style="width: 100%; background-color:#ffffff; border-radius: 10px 10px 10px 10px;">
                         <tbody>
                             <tr>
                             <td align="left" valign="middle" style="padding: 16px 0px 16px 16px; height: auto;">
@@ -121,7 +147,12 @@ do_action( 'woocommerce_email_before_order_table', $order, $sent_to_admin, $plai
                                 <div style="font-size:16px;mso-line-height-alt:22.4px;line-height:22.4px;text-align:left;text-align-last:left;color:#001942;font-weight:600;font-style:normal;">
                                 <div>
                                     <span style="font-family: 'DM Sans', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 140%; letter-spacing: -0.03em;" class="pc-w620-font-size-16px pc-w620-line-height-26px">
-                                        <?php echo wp_kses_post( $total['label'] ); ?>
+                                        <?php
+										echo wp_kses_post( $total['label'] ) . ' ';
+										if ( $email_improvements_enabled ) {
+											echo isset( $total['meta'] ) ? wp_kses_post( $total['meta'] ) : '';
+										}
+										?>
                                     </span>
                                 </div>
                                 </div>
@@ -157,6 +188,59 @@ do_action( 'woocommerce_email_before_order_table', $order, $sent_to_admin, $plai
                 <?php
 				}
 			}?>
+            <?php if ( $display_section_divider ) : ?>
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                    <tr>
+                        <td style="padding: 16px 0;">
+                            <hr style="border: 0; border-top: 1px solid #1E1E1E; border-top-color: rgba(30, 30, 30, 0.2); margin: 0;">
+                        </td>
+                    </tr>
+                </table>
+            <?php endif; ?>
+
+            <?php if ( $order->get_customer_note() && $email_improvements_enabled ) : ?>
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                    <tr>
+                        <td style="padding: 0;">
+                            <table class="pc-w620-tableCollapsed-0 order-customer-note" border="0" cellpadding="0" cellspacing="0" role="presentation" bgcolor="#ffffff" style="width: 100%; background-color:#ffffff; border-radius: 10px 10px 10px 10px;">
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 16px;">
+                                            <div class="pc-font-alt" style="text-decoration: none;">
+                                                <div style="font-size:14px;mso-line-height-alt:20px;line-height:20px;text-align:left;text-align-last:left;color:#001942;font-weight:400;font-style:normal;">
+                                                    <b><?php esc_html_e( 'Customer note', 'woocommerce' ); ?></b><br>
+                                                    <?php echo wp_kses( nl2br( wc_wptexturize_order_note( $order->get_customer_note() ) ), array( 'br' => array() ) ); ?>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            <?php elseif ( $order->get_customer_note() && ! $email_improvements_enabled ) : ?>
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                    <tr>
+                        <td style="padding: 0;">
+                            <table class="pc-w620-tableCollapsed-0 order-customer-note" border="0" cellpadding="0" cellspacing="0" role="presentation" bgcolor="#ffffff" style="width: 100%; background-color:#ffffff; border-radius: 10px 10px 10px 10px;">
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 16px;">
+                                            <div class="pc-font-alt" style="text-decoration: none;">
+                                                <div style="font-size:14px;mso-line-height-alt:20px;line-height:20px;text-align:left;text-align-last:left;color:#001942;font-weight:400;font-style:normal;">
+                                                    <b><?php esc_html_e( 'Note:', 'woocommerce' ); ?></b><br>
+                                                    <?php echo wp_kses( nl2br( wc_wptexturize_order_note( $order->get_customer_note() ) ), array() ); ?>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            <?php endif; ?>
             <tr>
             <td style="padding: 0px 0px 32px 0px;">
             <table class="pc-w620-tableCollapsed-0" border="0" cellpadding="0" cellspacing="0" role="presentation" bgcolor="#ffffff" style="width: 100%; background-color:#ffffff; border-radius: 10px 10px 10px 10px;">
@@ -176,3 +260,9 @@ do_action( 'woocommerce_email_before_order_table', $order, $sent_to_admin, $plai
 </tr>
 
 <?php do_action( 'woocommerce_email_after_order_table', $order, $sent_to_admin, $plain_text, $email ); ?>
+
+<?php
+if ( $email_improvements_enabled ) {
+	remove_filter( 'woocommerce_order_shipping_to_display_shipped_via', '__return_false' );
+}
+?>

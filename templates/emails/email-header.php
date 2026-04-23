@@ -12,16 +12,17 @@
  *
  * @see     https://woocommerce.com/document/template-structure/
  * @package WooCommerce\Templates\Emails
- * @version 9.8.0
+ * @version 10.4.0
  */
 
 use Automattic\WooCommerce\Utilities\FeaturesUtil;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 $email_improvements_enabled = FeaturesUtil::feature_is_enabled( 'email_improvements' );
+$store_name                 = $store_name ?? get_bloginfo( 'name', 'display' );
 
 ?>
 <!DOCTYPE html>
@@ -38,7 +39,7 @@ $email_improvements_enabled = FeaturesUtil::feature_is_enabled( 'email_improveme
  <meta name="x-apple-disable-message-reformatting" />
  <link href="https://fonts.googleapis.com/css?family=DM+Sans:ital,wght@0,400;0,400;0,500;0,600;0,700;0,800" rel="stylesheet" />
  <link href="https://fonts.googleapis.com/css?family=Rubik:ital,wght@0,400;0,400;0,500;0,600" rel="stylesheet" />
- <title><?php echo get_bloginfo( 'name', 'display' ); ?></title>
+ <title><?php echo esc_html( $store_name ); ?></title>
 
  <style>
  html, body { margin: 0 !important; padding: 0 !important; min-height: 100% !important; width: 100% !important; -webkit-font-smoothing: antialiased; }
@@ -251,9 +252,9 @@ $email_improvements_enabled = FeaturesUtil::feature_is_enabled( 'email_improveme
 										
                                         
                                         if ( $img ) {
-                                            echo '<img src="' . esc_url( $img ) . '" alt="' . esc_attr( get_bloginfo( 'name', 'display' ) ) . '" class="pc-w620-width-175 pc-w620-height-auto pc-w620-align-left" width="152" height="auto" style="display: block; outline: 0; line-height: 100%; -ms-interpolation-mode: bicubic; width: 45%; height: auto; border: 0;"/>';
+                                            echo '<img src="' . esc_url( $img ) . '" alt="' . esc_attr( $store_name ) . '" class="pc-w620-width-175 pc-w620-height-auto pc-w620-align-left" width="152" height="auto" style="display: block; outline: 0; line-height: 100%; -ms-interpolation-mode: bicubic; width: 45%; height: auto; border: 0;"/>';
                                         } else {
-                                            echo  esc_html( get_bloginfo( 'name', 'display' ) );
+                                            echo esc_html( $store_name );
                                         }
                                         ?>
 												
@@ -261,7 +262,7 @@ $email_improvements_enabled = FeaturesUtil::feature_is_enabled( 'email_improveme
 										<div id="template_header_image">
 											<?php
 											if ( $img ) {
-												echo '<img src="' . esc_url( $img ) . '" alt="' . esc_attr( get_bloginfo( 'name', 'display' ) ) . '" />';
+												echo '<img src="' . esc_url( $img ) . '" alt="' . esc_attr( $store_name ) . '" />';
 											}
 											?>
 										</div>

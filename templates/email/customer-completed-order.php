@@ -36,11 +36,12 @@ do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
  * @hooked WC_Structured_Data::output_structured_data() Outputs structured data.
  * @since 2.5.0
  */
-
 do_action( 'trefik_email_order_completed_section_hero', $order, $sent_to_admin, $plain_text, $email );
 do_action( 'trefik_email_order_completed_section_delivery_status',$order, $sent_to_admin, $plain_text, $email );
 
 do_action( 'woocommerce_email_order_details', $order, $sent_to_admin, $plain_text, $email );
+
+
 
 /*
  * @hooked WC_Emails::order_meta() Shows order meta data.
@@ -63,6 +64,10 @@ do_action( 'woocommerce_email_order_details', $order, $sent_to_admin, $plain_tex
 // }
 
 do_action( 'trefik_email_order_completed_section_contact', $order, $sent_to_admin, $plain_text, $email );
+do_action( 'trefik_email_order_completed_section_admin_order', $order, $sent_to_admin, $plain_text, $email );
+
+// do_action( 'trefik_email_order_completed_section_admin_order', $order, $sent_to_admin, $plain_text, $email );
+
 
 /*
  * @hooked WC_Emails::email_footer() Output the email footer

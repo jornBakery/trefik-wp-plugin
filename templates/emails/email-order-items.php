@@ -12,13 +12,17 @@
  *
  * @see     https://woocommerce.com/document/template-structure/
  * @package WooCommerce\Templates\Emails
- * @version 3.7.0
+ * @version 10.4.0
  */
+
+use Automattic\WooCommerce\Utilities\FeaturesUtil;
 
 defined( 'ABSPATH' ) || exit;
 
-$text_align  = is_rtl() ? 'right' : 'left';
 $margin_side = is_rtl() ? 'left' : 'right';
+
+$email_improvements_enabled = FeaturesUtil::feature_is_enabled( 'email_improvements' );
+$price_text_align           = $email_improvements_enabled ? 'right' : 'left';
 
 foreach ( $items as $item_id => $item ) :
 	$product       = $item->get_product();
@@ -60,7 +64,16 @@ foreach ( $items as $item_id => $item ) :
                                                                 valign="top"
                                                                 style="padding: 0px 20px 0px 0px; height: auto;">
                                                                 <?php
-                                                                    echo wp_kses_post( apply_filters('trefik_email_order_item_thumbnail', apply_filters( 'woocommerce_order_item_thumbnail', $image, $item ) ));
+                                                                    /**
+                                                                     * Email Order Item Thumbnail hook.
+                                                                     *
+                                                                     * @param string                $image The image HTML.
+                                                                     * @param WC_Order_Item_Product $item  The item being displayed.
+                                                                     * @since 2.1.0
+                                                                     */;
+                                                                    if ( $show_image ) {
+                                                                        echo wp_kses_post( apply_filters( 'trefik_email_order_item_thumbnail', apply_filters( 'woocommerce_order_item_thumbnail', $image, $item ) ) );
+                                                                    }
                                                                 ?>
                                                             </td>
                                                         </tr>
@@ -98,8 +111,14 @@ foreach ( $items as $item_id => $item ) :
                                                                                                             <div>
                                                                                                                 <span style="font-family: 'Rubik', Arial, Helvetica, sans-serif; font-size: 20px; line-height: 140%; letter-spacing: -0.03em;" class="pc-w620-font-size-16px pc-w620-line-height-26px">
                                                                                                                     <?php
-                                                                                                                        // Product name.
-                                                                                                                        echo wp_kses_post( apply_filters( 'woocommerce_order_item_name', $item->get_name(), $item, false ) );
+                                                                                                                    /**
+                                                                                                                     * Order Item Name hook.
+                                                                                                                     *
+                                                                                                                     * @param string                $item_name The item name HTML.
+                                                                                                                     * @param WC_Order_Item_Product $item      The item being displayed.
+                                                                                                                     * @since 2.1.0
+                                                                                                                     */
+                                                                                                                    echo wp_kses_post( apply_filters( 'woocommerce_order_item_name', $item->get_name(), $item, false ) );
                                                                                                                     ?>
                                                                                                                 </span>
                                                                                                             </div>
@@ -128,7 +147,8 @@ foreach ( $items as $item_id => $item ) :
                                                                                                         style="text-decoration: none;">
                                                                                                         <div
                                                                                                             style="font-size:16px;mso-line-height-alt:20px;line-height:20px;text-align:left;text-align-last:left;color:#001942;font-weight:400;font-style:normal;">
-                                                                                                            <div><span
+                                                                                                            <div>
+                                                                                                                <span
                                                                                                                     style="font-family: 'DM Sans', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 140%; letter-spacing: -0.03em;"
                                                                                                                     class="pc-w620-font-size-16px pc-w620-line-height-20px">
                                                                                                                     <?php echo wp_kses_post( $order->get_formatted_line_subtotal( $item ) ); ?>
@@ -146,6 +166,8 @@ foreach ( $items as $item_id => $item ) :
                                                                                         class="pc-w620-align-left"
                                                                                         align="left"
                                                                                         style="padding: 10px 0px 0px 0px; text-align: left; font-weight: normal;">
+                                                                                         
+                                                                                                                    
                                                                                         <!--[if mso]>
                                                                                             <table border="0" cellpadding="0" cellspacing="0" role="presentation" class="pc-w620-align-left" align="left" style="border-collapse: separate; border-spacing: 0;">
                                                                                                 <tr>
@@ -171,18 +193,41 @@ foreach ( $items as $item_id => $item ) :
                                                                                                 <span style="display:inline-block;">
                                                                                                     <span style="font-family: 'DM Sans', Arial, Helvetica, sans-serif; font-size: 17px; line-height: 24px;">
                                                                                                     <?php
+                                                                                                    /**
+                                                                                                     * Allow other plugins to add additional product information.
+                                                                                                     *
+                                                                                                     * @param int                   $item_id    The item ID.
+                                                                                                     * @param WC_Order_Item_Product $item       The item object.
+                                                                                                     * @param WC_Order              $order      The order object.
+                                                                                                     * @param bool                  $plain_text Whether the email is plain text or not.
+                                                                                                     * @since 2.3.0
+                                                                                                     */
                                                                                                         // allow other plugins to add additional product information here.
                                                                                                         do_action( 'woocommerce_order_item_meta_start', $item_id, $item, $order, $plain_text );
 
-                                                                                                        wc_display_item_meta(
+                                                                                                        $item_meta = wc_display_item_meta(
                                                                                                             $item,
                                                                                                             array(
                                                                                                                 'before'        => '',
                                                                                                                 'after'         => '',
-                                                                                                                'separator'     => '',
+                                                                                                                'separator'     => '<br>',
+                                                                                                                'echo'          => false,
                                                                                                                 'label_before'  => '',
                                                                                                                 'label_after'   => '',
                                                                                                                 'show_meta_key' => false,
+                                                                                                            )
+                                                                                                        );
+                                                                                                        echo wp_kses(
+                                                                                                            $item_meta,
+                                                                                                            array(
+                                                                                                                'br'   => array(),
+                                                                                                                'span' => array(),
+                                                                                                                'a'    => array(
+                                                                                                                    'href'   => true,
+                                                                                                                    'target' => true,
+                                                                                                                    'rel'    => true,
+                                                                                                                    'title'  => true,
+                                                                                                                ),
                                                                                                             )
                                                                                                         );
 
@@ -232,7 +277,7 @@ foreach ( $items as $item_id => $item ) :
                                             } else {
                                                 $qty_display = esc_html( $qty );
                                             }
-                                            echo wp_kses_post( apply_filters( 'woocommerce_email_order_item_quantity', $qty_display, $item ) );
+                                            echo wp_kses_post( ( $email_improvements_enabled ? '×' : '' ) . apply_filters( 'woocommerce_email_order_item_quantity', $qty_display, $item ) . ( $email_improvements_enabled ? '' : 'x' ) );
                                         ?>
                                         </span>
                                     </div>
