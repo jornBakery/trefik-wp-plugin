@@ -7,7 +7,7 @@ use Trefik\Core\Helper;
 
 class WooEmailHooks {
 
-    protected static $path = 'email/';
+    protected static $path = 'emails/';
 
     public function register_hooks() {
         add_action('trefik_email_order_completed_section_hero', [$this, 'email_order_completed_section_hero'], 10, 4);
@@ -67,6 +67,7 @@ class WooEmailHooks {
 
     private function include_template($template_path) {
         $template_path = Config::template_path() . self::$path .$template_path . '.php';
+        Helper::write_log(['WooEmailHooks::include_template', $template_path]);
         if(file_exists($template_path)){
             include($template_path);
             return;
