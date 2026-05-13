@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
                     <tr>
                     <td align="center" valign="top" style="padding: 0px 0px 32px 0px; height: auto;">
-                    <img src="/wp-content/uploads/2024/11/icon-tref-ik-voortgezet-onderwijs-voorlichting.png" width="150" height="150" alt="" style="display: block; outline: 0; line-height: 100%; -ms-interpolation-mode: bicubic; width: 150px; height: auto; max-width: 100%; border: 0;" />
+                    <img src="<?= site_url('/wp-content/uploads/2024/11/icon-tref-ik-voortgezet-onderwijs-voorlichting.png') ?>" width="150" height="150" alt="" style="display: block; outline: 0; line-height: 100%; -ms-interpolation-mode: bicubic; width: 150px; height: auto; max-width: 100%; border: 0;" />
                     </td>
                     </tr>
                     </table>

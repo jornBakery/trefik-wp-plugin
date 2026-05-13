@@ -56,7 +56,7 @@ $email_footer_text = wp_kses_post(
                 <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
                  <tr>
                   <td align="center" valign="top" style="padding: 0px 0px 12px 0px; height: auto;">
-                   <img src="/wp-content/uploads/2021/06/logo-tref-ik-512x-300x111.png" width="135" height="49" alt="" style="display: block; outline: 0; line-height: 100%; -ms-interpolation-mode: bicubic; width: 135px; height: auto; max-width: 100%; border: 0;" />
+                   <img src="<?= site_url('/wp-content/uploads/2021/06/logo-tref-ik-512x-300x111.png') ?>" width="135" height="49" alt="" style="display: block; outline: 0; line-height: 100%; -ms-interpolation-mode: bicubic; width: 135px; height: auto; max-width: 100%; border: 0;" />
                   </td>
                  </tr>
                 </table>
