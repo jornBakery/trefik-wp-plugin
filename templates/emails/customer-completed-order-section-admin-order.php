@@ -221,7 +221,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                                                                                                                             <td class="pc-w620-halign-right"
                                                                                                                                 align="right"
                                                                                                                                 valign="top">
-                                                                                                                                <img src="https://tref-ik.jhbdesigns.nl/wp-content/uploads/2025/04/icon-9.png"
+                                                                                                                                <img src="/wp-content/uploads/2025/04/icon-9.png"
                                                                                                                                     class="pc-w620-align-right"
                                                                                                                                     width="32"
                                                                                                                                     height="25"
